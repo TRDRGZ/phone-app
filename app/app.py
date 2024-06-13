@@ -14,7 +14,6 @@ def index():
 def start_audio_stream():
     port = request.args.get('port')
     ip_address = request.args.get('ip_addr')
-    print('-------ipaddress-----------', request.args)
 
     if ip_address:
         cmd = f"rec -t raw -b 16 -c 1 -e s -r 44100 - | ./phone {ip_address} {port} | play -t raw -b 16 -c 1 -e s -r 44100 -"
