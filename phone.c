@@ -12,9 +12,9 @@
 #define BUFFER_SIZE 2048  // 変更: バッファサイズを適切に設定
 
 void gate(signed short* buffer, double* amplitude) {
-    double threshold = 0.1; // 0.0 ~ 1.0 これを超えるとゲートが開く　静かな自習室で試したところ0.1が適正値
-    double release = 0.95;  // 0.0 ~ 1.0 ゲートの閉じるスピードを調整
-    double attack = 0.1;   // 0.0 ~ 1.0 ゲートの開くスピードを調整
+    double threshold = 0.1; // 0.0 ~ 1.0 入力波形の変位がこれを超えるとゲートが開く
+    double release = 0.95;  // 0.0 ~ 1.0 ゲートの閉じるスピードを調整 amplitude *= release^t
+    double attack = 0.1;   // 0.0 ~ 1.0 ゲートの開くスピードを調整 amplitude += attack/t
     int i;
 
     // バッファ内のすべてのサンプルとthresholdを比較
@@ -23,14 +23,14 @@ void gate(signed short* buffer, double* amplitude) {
 
         // 一つでもサンプルがthresholdを超えていた場合
         if (level > threshold * 32768) {
-            *amplitude += attack; // amplitude加算
+            *amplitude += attack; // amplitude増加
             if (*amplitude > 1.0) *amplitude = 1.0;  // 上限を1.0にする
             break;
         }
     }
     // 一つもthresholdを超えないままループを終えた場合
     if (i >= BUFFER_SIZE) {
-        *amplitude *= release;
+        *amplitude *= release; //amplitude減少
         if (*amplitude < 0.0) *amplitude = 0.0;  // 下限を0.0にする
     }
 }
@@ -53,8 +53,8 @@ void *send_audio(void *arg) {
     while (1) {
         ssize_t num_read = read(STDIN_FILENO, buffer, sizeof(buffer));
         if (num_read <= 0) break;
-        gate(buffer, &amplitude);
-        amp(buffer, &amplitude);
+        gate(buffer, &amplitude); //bufferを送ってゲートの動きを決定
+        amp(buffer, &amplitude); //ゲートの動きに合わせてバッファの中身の音量変更
         send(sock, buffer, num_read, 0);
     }
     return NULL;
