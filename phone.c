@@ -12,7 +12,7 @@
 #define BUFFER_SIZE 2048  // 変更: バッファサイズを適切に設定
 
 void gate(signed short* buffer, double* amplitude) {
-    double threshold = 0.1; // 0.0 ~ 1.0 入力波形の変位がこれを超えるとゲートが開く
+    double threshold = 0.2; // 0.0 ~ 1.0 入力波形の変位がこれを超えるとゲートが開く
     double release = 0.95;  // 0.0 ~ 1.0 ゲートの閉じるスピードを調整 amplitude *= release^t
     double attack = 0.1;   // 0.0 ~ 1.0 ゲートの開くスピードを調整 amplitude += attack/t
     int i;
